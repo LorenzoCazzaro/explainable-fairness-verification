@@ -330,9 +330,9 @@ int main(int argc, char *argv[])
     bool flag_print = false;
 
     /* check input parameters */
-    if (argc < 14)
+    if (argc < 13)
     {
-        std::cout << "./executable <ensemble_filename.json> <columns_filename.json> <categorical_columns_names.json> <numerical_columns_indexes.json> <categorical_columns_indexes.json> <protected_attribute> <n_iter_analyze> <n_threads> <n_threads_filtering> <filename_dump_hyperrects.json> <test_set_filename.json> <n_iter_synthesiser> <output_conditions_filename_base.json> <normalizations_columns_conditions.json>" << std::endl;
+        std::cout << "./executable <ensemble_filename.json> <columns_filename.json> <categorical_columns_names.json> <numerical_columns_indexes.json> <categorical_columns_indexes.json> <protected_attribute> <n_iter_analyze> <n_threads> <filename_dump_hyperrects.json> <n_iter_synthesiser> <output_conditions_filename_base.json> <normalizations_columns_conditions.json>" << std::endl;
         return -1;
     }
 
@@ -429,52 +429,11 @@ int main(int argc, char *argv[])
     size_t n_threads;
     sscanf(argv[8], "%zu", &n_threads);
 
-    size_t n_thread_filtering;
-    sscanf(argv[9], "%zu", &n_thread_filtering);
-
-    string filename_dump_hyperrects = argv[10];
+    string filename_dump_hyperrects = argv[9];
 
     set<SymbolicAttack> U;
     set<HyperRectangle> U_preimgs;
     analyze_ensemble(*T, A, n_threads, n_iter, n_iter, U);
-
-    std::vector<std::vector<float>> test_set;
-    std::vector<std::vector<float>> test_set_reduced;
-    std::vector<float> test_labels;
-    load_dataset(argv[12], test_set, test_labels);
-    #if REDUCED_FEATURE_SPACE == 1
-        test_set_reduced = prune_dataset(test_set, used_features);
-    #endif
-
-    float counter2 = 0;
-    vector<vector<float>> no_discr_test_set; //test set per score futuri
-    #if REDUCED_FEATURE_SPACE == 1
-        vector<vector<float>> no_discr_test_set_reduced; //test set per score futuri
-        for (size_t i = 0; i < test_set_reduced.size(); i++) {
-            float pred = T->predict(test_set_reduced[i]);
-            vector<float> inst_copy = test_set_reduced[i];
-            inst_copy[protected_attribute_index] = (inst_copy[protected_attribute_index] == 1) ? 0 : 1;
-            float flipped_pred = T->predict(inst_copy);
-            if (flipped_pred != pred)
-                counter2++;
-            else {
-                no_discr_test_set.push_back(test_set[i]);
-                no_discr_test_set_reduced.push_back(test_set_reduced[i]); //test set per score futuri
-            }
-        }
-    #else  
-        for (size_t i = 0; i < test_set.size(); i++) {
-            float pred = T->predict(test_set[i]);
-            vector<float> inst_copy = test_set[i];
-            inst_copy[protected_attribute_index] = (inst_copy[protected_attribute_index] == 1) ? 0 : 1;
-            float flipped_pred = T->predict(inst_copy);
-            if (flipped_pred != pred)
-                counter2++;
-            else {
-                no_discr_test_set.push_back(test_set[i]);
-            }
-        }
-    #endif
 
     unordered_set<HyperRectangle> parity_not_valid(0);
     unordered_set<HyperRectangle> parity_not_valid_partial(0);
@@ -508,9 +467,9 @@ int main(int argc, char *argv[])
     }
 
     size_t n_iter_synthesiser;
-    sscanf(argv[13], "%zu", &n_iter_synthesiser);
+    sscanf(argv[10], "%zu", &n_iter_synthesiser);
 
-    string output_conditions_filename_base = argv[15];
+    string output_conditions_filename_base = argv[11];
 
     list<Condition> parity_holds_conditions;
 
@@ -534,7 +493,7 @@ int main(int argc, char *argv[])
     #endif
 
     #if CONDITIONS_OUTPUT == 1
-        string norm_info_string = read_file(argv[17], "normalization");
+        string norm_info_string = read_file(argv[12], "normalization");
         vector<vector<float>> normalization_conditions;
         auto loaded1 = jc::decode_json<vector<vector<float>>>(norm_info_string);
         for (vector<float> v : loaded1)

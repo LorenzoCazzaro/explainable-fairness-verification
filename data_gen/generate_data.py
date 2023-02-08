@@ -45,8 +45,6 @@ if also_type == 0:
     clf.fit(X_train, y_train)
     print("TREE SCORE: ", clf.score(X_test, y_test))
     sklearn_to_json(clf.estimators_, dim, path + filename + ".json")
-    dump(clf, path + filename + ".joblib")
-    print(clf.feature_importances_)
 
 if also_type == 1:
     print(X_test.shape)

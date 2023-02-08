@@ -89,32 +89,26 @@ def preproc_adult(feats_to_remove = []): #45222 88
 	numerical_binary_columns_indices = [i-1 for i, x in enumerate(dataset.columns) if x in numerical_binary_columns]
 	numerical_binary_columns_names = [name for name in dataset.columns if name in numerical_binary_columns]
 
-	suffix_filename = "" if len(feats_to_remove) == 0 else "-"
-	for c in feats_to_remove:
-		suffix_filename += (c + "_")
-	if len(suffix_filename) != 0:
-		suffix_filename = suffix_filename[:-1]
-
-	Dataset.save(dataset, "../adult/dataset" + suffix_filename + ".csv")
-	Dataset.save(training_set, "../adult/training-set" + suffix_filename + ".csv")
-	Dataset.save(test_set, "../adult/test-set" + suffix_filename + ".csv")
-	Dataset.exportColumns(dataset, "../adult/columns" + suffix_filename + ".csv")
-	dataset_column_names_file = open("../adult/ad_column_names" + suffix_filename + ".json", "w")
+	Dataset.save(dataset, "../adult/dataset.csv")
+	Dataset.save(training_set, "../adult/training-set.csv")
+	Dataset.save(test_set, "../adult/test-set.csv")
+	Dataset.exportColumns(dataset, "../adult/columns.csv")
+	dataset_column_names_file = open("../adult/ad_column_names.json", "w")
 	dataset_column_names_file.write(json.dumps(dataset.columns.tolist()[1:]))
 	dataset_column_names_file.close()
-	dataset_categorical_column_names_file = open("../adult/ad_categorical_column_names" + suffix_filename + ".json", "w")
+	dataset_categorical_column_names_file = open("../adult/ad_categorical_column_names.json", "w")
 	dataset_categorical_column_names_file.write(json.dumps(categorical_columns_names))
 	dataset_categorical_column_names_file.close()
-	dataset_categorical_column_index_file = open("../adult/ad_categorical_column_index" + suffix_filename + ".json", "w")
+	dataset_categorical_column_index_file = open("../adult/ad_categorical_column_index.json", "w")
 	dataset_categorical_column_index_file.write(json.dumps(categorical_columns_indices))
 	dataset_categorical_column_index_file.close()
-	dataset_numerical_binary_column_names_file = open("../adult/ad_numerical_binary_column_names" + suffix_filename + ".json", "w")
+	dataset_numerical_binary_column_names_file = open("../adult/ad_numerical_binary_column_names.json", "w")
 	dataset_numerical_binary_column_names_file.write(json.dumps(numerical_binary_columns_names))
 	dataset_numerical_binary_column_names_file.close()
-	dataset_numerical_binary_column_index_file = open("../adult/ad_numerical_binary_column_index" + suffix_filename + ".json", "w")
+	dataset_numerical_binary_column_index_file = open("../adult/ad_numerical_binary_column_index.json", "w")
 	dataset_numerical_binary_column_index_file.write(json.dumps(numerical_binary_columns_indices))
 	dataset_numerical_binary_column_index_file.close()
-	dataset_lims_file = open("../adult/ad_normalization_info" + suffix_filename + ".json", "w")
+	dataset_lims_file = open("../adult/ad_normalization_info.json", "w")
 	dataset_lims_file.write(json.dumps(norm_info))
 	dataset_lims_file.close()
 
@@ -125,9 +119,9 @@ def load_entire_adult(feats_to_remove = []):
 	if len(suffix_filename) != 0:
 		suffix_filename = suffix_filename[:-1]
 
-	column_names = pd.read_csv("../adult/columns" + suffix_filename + ".csv", sep=',', header=None).to_numpy()
-	dataset = pd.read_csv("../adult/dataset" + suffix_filename + ".csv", sep=',', header=None).to_numpy()
-	dataset_lims_file = open("../adult/ad_normalization_info" + suffix_filename + ".json", "r")
+	column_names = pd.read_csv("../adult/columns.csv", sep=',', header=None).to_numpy()
+	dataset = pd.read_csv("../adult/dataset.csv", sep=',', header=None).to_numpy()
+	dataset_lims_file = open("../adult/ad_normalization_info.json", "r")
 	norm_info = json.load(dataset_lims_file)
 	return dataset[:, 1:], dataset[:, 0], norm_info, column_names[0][1:]
 
@@ -262,26 +256,3 @@ def rec_visit(node, dict_tree):
             node_id_r, l2l, l2r = rec_visit(node.right, dict_tree)
 
             return input_id, [node_id_l] + l1l + l2l, [node_id_r] + l1r + l2r
-
-# prende in unput una lista di alberi
-def sklearn_to_dict(trees, dim, filename):
-    ensamble = []
-    classes = np.asarray([-1, 1])
-
-    for tr in trees:
-        dict_tree = {}
-        n_nodes = len(tr.tree_.value)
-        n_labels = len(tr.tree_.value[0][0])   
-        value = np.asarray(tr.tree_.value.reshape(n_nodes, n_labels), dtype=int)
-        prediction = classes[np.argmax(value, axis=1)]
-
-        dict_tree['feature'] = tr.tree_.feature
-        dict_tree['threshold'] = tr.tree_.threshold
-        dict_tree['children_left'] = tr.tree_.children_left
-        dict_tree['children_right'] = tr.tree_.children_right
-        dict_tree['prediction'] = prediction
-        dict_tree['value'] = value
-        ensamble.append(dict_tree)
-
-    with open(filename, 'w') as f:
-        f.write(foo(ensamble, dim))
