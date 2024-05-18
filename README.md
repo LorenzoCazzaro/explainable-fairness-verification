@@ -1,12 +1,22 @@
-# Explainable Global Fairness Verification
+Explainable Global Fairness Verification of Tree-Based Classifiers
+===============================
 
-This repository contains the implementation of the synthesiser of sufficient conditions for fairness for decision-tree ensembles proposed by **Calzavara *et. al.*** in their research paper titled [<em>Explainable Global Fairness Verification of Tree-Based Classifiers</em>](https://openreview.net/forum?id=HOu7LgqCTqd). At the moment, this repository contains the code of the synthesiser. The scripts to scripts to reproduce the experiments described in the paper will be added soon.
+This code is for SaTML 2023 full paper [Explainable Global Fairness Verification of Tree-Based Classifiers](https://doi.org/10.1109/SaTML54575.2023.00011).
 
-## Installation
+Abstract
+---
+We present a new approach to the global fairness verification of tree-based classifiers. Given a tree-based classifier and a set of sensitive features potentially leading to discrimination, our analysis synthesizes sufficient conditions for fairness, expressed as a set of traditional propositional logic formulas, which are readily understandable by human experts. The verified fairness guarantees are global, in that the formulas predicate over all the possible inputs of the classifier, rather than just a few specific test instances. Our analysis is formally proved both sound and complete. Experimental results on public datasets show that the analysis is precise, explainable to human experts and efficient enough for practical adoption.
+
+
+Installation
+---
+
 Download the repository. Remember to compile using the flags <em>-Iinclude</em> and <em>-lpthread</em> to use the synthesiser.
 
-### Requirments
-The following requirements are necessary to use the analyzer. For reproducibility reasons, specific versions of the libraries are required.
+Requirements
+---
+
+To use the analyzer, you need the following requirements: specific versions of the libraries for reproducibility purposes.
 - Python3
 - C++14 compiler
 - sklearn (version 0.23.2 used for the experiments)
@@ -14,16 +24,19 @@ The following requirements are necessary to use the analyzer. For reproducibilit
 - numpy (version 1.19.1 used for the experiments)
 - boost C++ libraries
   
-### Data-Independent Stability Analysis
-The resilience-verification repository at [https://github.com/FedericoMarcuzzi/resilience-verification](https://github.com/FedericoMarcuzzi/resilience-verification) contains the instructions to execute the data-independent stability analysis on the tree-based classifier.
-At the moment, this repo contains the essential code to perform the data-independent stability analysis. 
+Data-Independent Stability Analysis
+---
 
-## Usage
+The resilience-verification repository at [https://github.com/FedericoMarcuzzi/resilience-verification](https://github.com/FedericoMarcuzzi/resilience-verification) contains the instructions to execute the data-independent stability analysis on the tree-based classifier.
+This repo currently contains the essential code to perform the data-independent stability analysis. 
+
+Usage
+---
 
 ### Apply pre-processing to datasets
 
-The synthesizer requires the dataset to be pre-proc by applying 0-1 normalization and one-hot-encoding to the categorical features.
-If you want to use datasets not provided by this repo, have a look at the pre-processing functions contained in <em>./data_gen/misc.py</em> and to the datasets folder in order to understand which files must be generated (names are self explanatory).
+The synthesizer requires the dataset to be pre-proc by applying 0-1 normalization and one-hot encoding to the categorical features.
+If you want to use datasets not provided by this repo, have a look at the pre-processing functions contained in <em>./data_gen/misc.py</em> and in the datasets folder to understand which files must be generated (names are self-explanatory).
 
 For what concerns the datasets used in the experimental evaluation in the paper, execute the command inside the <em>data_gen</em> folder:
 ```bash
@@ -35,11 +48,11 @@ After the dataset pre-processing, execute the following command inside the <em>d
 ```bash
 python3 generate_data.py <dataset_abbreviation> 1 <random_seed>
 ```
-By using this command, the pre-proc dataset is splitted in training-set and test-set.
+By using this command, the pre-proc dataset is split into training and test sets.
 
 Supported dataset abbreviations are "ad" (adult), "gm" (german) and "ht" (health). Add our abbreviations in <em>generate_data.py</em> if you want to support other datasets.
 
-Then, execute the following command from the data_gen folder to generate a decision tree-ensemble in the supported format:
+Then, execute the following command from the data_gen folder to generate a decision tree-based ensemble in the supported format:
 
 ```bash
 python3 generate_data.py <dataset_abbreviation> 0 <random_seed> <n_trees> <max_depth>
@@ -64,28 +77,36 @@ The specific parameters are:
 - <em>categorical_columns_indexes.json</em>: the JSON file containing the indexes of the categorical features.
 - <em>protected_attribute</em>: name of the sensitive attribute.
 - <em>n_iter_analyze > 0</em>: number of iterations performed by the data-independent stability analyzer.
-- <em>n_threads > 1</em>: number of used threads by the the data-independent stability analyzer.
+- <em>n_threads > 1</em>: number of threads used by the data-independent stability analyzer.
 - <em>filename_dump_hyperrects.json</em>: name of the file in which the hyper-rectangles generated by the DISA will be dumped.
 - <em>n_iter_synthesiser > 0</em>: number of iterations performed by the synthesizer.
 - <em>output_conditions_filename_base</em>: prefix of the name of the files that will contain the generated conditions separated by their complexity.
-- <em>normalizations_columns_conditions.json</em>: file containing minimu, maximum, mean and std for any feature.
+- <em>normalizations_columns_conditions.json</em>: a file containing minimum, maximum, mean, and std for any feature.
 
 #### Example
 ```bash
 ./synthesizer ./adult/models/rf_ad_5_6_7.json ./adult/ad_column_names.json ./adult/ad_categorical_column_names.json ./adult/ad_numerical_binary_column_index.json ./adult/ad_categorical_column_index.json sex_male 40 1 ./res/adult/hypers/hypers_ad_5_6_7_100iterA 4 ./res/adult/fair_conditions/fair_conditions_ad_5_6_7_100iterA_1threadF ./adult/ad_normalization_info.json
 ```
 
-## Run the experiments presented in the paper
-Coming soon...
-
-## Credit
+Credits
+---
 
 If you use this implementation in your work, please add a reference/citation to our paper. You can use the following BibTeX entry:
 
 ```
-
+@inproceedings{10136173,
+  author={Calzavara, Stefano and Cazzaro, Lorenzo and Lucchese, Claudio and Marcuzzi, Federico},
+  booktitle={2023 IEEE Conference on Secure and Trustworthy Machine Learning (SaTML)}, 
+  title={Explainable Global Fairness Verification of Tree-Based Classifiers}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={1-17},
+  keywords={Sufficient conditions;Machine learning;Testing;n/a},
+  doi={10.1109/SaTML54575.2023.00011}}
 ```
 
-## Support
+Support
+---
 
-If you want to ask questions about the code and how to use it, feel free to contact us by sending an email to lorenzo.cazzaro@unive.it or federico.marcuzzi@unive.it.
+If you have questions about the code or how to use it, feel free to email us at [lorenzo.cazzaro@unive.it](lorenzo.cazzaro@unive.it) or [federico.marcuzzi@unive.it](federico.marcuzzi@unive.it).
